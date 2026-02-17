@@ -8,8 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-///█ ■
-////https://www.youtube.com/watch?v=SGZgvMwjq2U
+
 namespace Snake
 {
     class Program
@@ -96,50 +95,57 @@ namespace Snake
                         gameOver = 1;
                     }
                 }
+
                 if (gameOver == 1)
                 {
                     break;
                 }
+
                 Console.SetCursorPosition(snakeHead.posX, snakeHead.posY);
                 Console.ForegroundColor = snakeHead.color;
                 Console.Write("■");
+
                 Console.SetCursorPosition(berryPosX, berryPosY);
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write("■");
+
                 startTime = DateTime.Now;
                 buttonPressed = "no";
+
                 while (true)
                 {
                     currentTime = DateTime.Now;
                     if (currentTime.Subtract(startTime).TotalMilliseconds > 500) { break; }
                     if (Console.KeyAvailable)
                     {
-                        ConsoleKeyInfo toets = Console.ReadKey(true);
-                        //Console.WriteLine(toets.Key.ToString());
-                        if (toets.Key.Equals(ConsoleKey.UpArrow) && currentDirection != "DOWN" && buttonPressed == "no")
+                        ConsoleKeyInfo pressedKey = Console.ReadKey(true);
+
+                        if (pressedKey.Key.Equals(ConsoleKey.UpArrow) && currentDirection != "DOWN" && buttonPressed == "no")
                         {
                             currentDirection = "UP";
                             buttonPressed = "yes";
                         }
-                        if (toets.Key.Equals(ConsoleKey.DownArrow) && currentDirection != "UP" && buttonPressed == "no")
+                        if (pressedKey.Key.Equals(ConsoleKey.DownArrow) && currentDirection != "UP" && buttonPressed == "no")
                         {
                             currentDirection = "DOWN";
                             buttonPressed = "yes";
                         }
-                        if (toets.Key.Equals(ConsoleKey.LeftArrow) && currentDirection != "RIGHT" && buttonPressed == "no")
+                        if (pressedKey.Key.Equals(ConsoleKey.LeftArrow) && currentDirection != "RIGHT" && buttonPressed == "no")
                         {
                             currentDirection = "LEFT";
                             buttonPressed = "yes";
                         }
-                        if (toets.Key.Equals(ConsoleKey.RightArrow) && currentDirection != "LEFT" && buttonPressed == "no")
+                        if (pressedKey.Key.Equals(ConsoleKey.RightArrow) && currentDirection != "LEFT" && buttonPressed == "no")
                         {
                             currentDirection = "RIGHT";
                             buttonPressed = "yes";
                         }
                     }
                 }
+
                 TorsoPosX.Add(snakeHead.posX);
                 TorsoPosY.Add(snakeHead.posY);
+
                 switch (currentDirection)
                 {
                     case "UP":
@@ -155,12 +161,14 @@ namespace Snake
                         snakeHead.posX++;
                         break;
                 }
+
                 if (TorsoPosX.Count() > score)
                 {
                     TorsoPosX.RemoveAt(0);
                     TorsoPosY.RemoveAt(0);
                 }
             }
+
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2);
             Console.WriteLine("Game over, Score: " + score);
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2 + 1);
@@ -173,4 +181,3 @@ namespace Snake
         }
     }
 }
-//¦
