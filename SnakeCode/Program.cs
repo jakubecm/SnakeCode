@@ -47,43 +47,13 @@ namespace Snake
             while (true)
             {
                 Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Green;
+
+                DrawBorders(screenWidth, screenHeight);
 
                 if (snakeHead.posX == screenWidth - 1 || snakeHead.posX == 0 || snakeHead.posY == screenHeight - 1 || snakeHead.posY == 0)
                 {
                     gameOver = 1;
-                }
-
-                for (int i = 0; i < screenWidth; i++)
-                {
-                    Console.SetCursorPosition(i, 0);
-                    Console.Write("■");
-                }
-
-                for (int i = 0; i < screenWidth; i++)
-                {
-                    Console.SetCursorPosition(i, screenHeight - 1);
-                    Console.Write("■");
-                }
-
-                for (int i = 0; i < screenHeight; i++)
-                {
-                    Console.SetCursorPosition(0, i);
-                    Console.Write("■");
-                }
-
-                for (int i = 0; i < screenHeight; i++)
-                {
-                    Console.SetCursorPosition(screenWidth - 1, i);
-                    Console.Write("■");
-                }
-
-                Console.ForegroundColor = ConsoleColor.Green;
-
-                if (berryPosX == snakeHead.posX && berryPosY == snakeHead.posY)
-                {
-                    score++;
-                    berryPosX = numberGenerator.Next(1, screenWidth - 2);
-                    berryPosY = numberGenerator.Next(1, screenHeight - 2);
                 }
 
                 for (int i = 0; i < TorsoPosX.Count(); i++)
@@ -101,13 +71,13 @@ namespace Snake
                     break;
                 }
 
-                Console.SetCursorPosition(snakeHead.posX, snakeHead.posY);
-                Console.ForegroundColor = snakeHead.color;
-                Console.Write("■");
+                if (berryPosX == snakeHead.posX && berryPosY == snakeHead.posY)
+                {
+                    score++;
+                }
 
-                Console.SetCursorPosition(berryPosX, berryPosY);
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("■");
+                DrawSnakeHead(snakeHead);
+                DrawBerry(numberGenerator, screenWidth, screenHeight);
 
                 startTime = DateTime.Now;
                 buttonPressed = "no";
@@ -115,7 +85,9 @@ namespace Snake
                 while (true)
                 {
                     currentTime = DateTime.Now;
+
                     if (currentTime.Subtract(startTime).TotalMilliseconds > 500) { break; }
+
                     if (Console.KeyAvailable)
                     {
                         ConsoleKeyInfo pressedKey = Console.ReadKey(true);
@@ -173,11 +145,55 @@ namespace Snake
             Console.WriteLine("Game over, Score: " + score);
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2 + 1);
         }
-        class Pixel
+        public class Pixel
         {
             public int posX { get; set; }
             public int posY { get; set; }
             public ConsoleColor color { get; set; }
+        }
+
+        public static void DrawBorders(int screenWidth, int screenHeight)
+        {
+            for (int i = 0; i < screenWidth; i++)
+            {
+                Console.SetCursorPosition(i, 0);
+                Console.Write("■");
+            }
+
+            for (int i = 0; i < screenWidth; i++)
+            {
+                Console.SetCursorPosition(i, screenHeight - 1);
+                Console.Write("■");
+            }
+
+            for (int i = 0; i < screenHeight; i++)
+            {
+                Console.SetCursorPosition(0, i);
+                Console.Write("■");
+            }
+
+            for (int i = 0; i < screenHeight; i++)
+            {
+                Console.SetCursorPosition(screenWidth - 1, i);
+                Console.Write("■");
+            }
+        }
+
+        public static void DrawSnakeHead(Pixel snakeHead)
+        {
+            Console.SetCursorPosition(snakeHead.posX, snakeHead.posY);
+            Console.ForegroundColor = snakeHead.color;
+            Console.Write("■");
+        }
+
+        public static void DrawBerry(Random generator, int screenWidth, int screenHeight) 
+        {
+            int berryPosX = generator.Next(1, screenWidth - 2);
+            int berryPosY = generator.Next(1, screenHeight - 2);
+
+            Console.SetCursorPosition(berryPosX, berryPosY);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("■");
         }
     }
 }
