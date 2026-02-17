@@ -47,9 +47,9 @@ namespace Snake
             while (true)
             {
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Green;
 
                 DrawBorders(screenWidth, screenHeight);
+                Console.ForegroundColor = ConsoleColor.Green;
 
                 if (snakeHead.posX == screenWidth - 1 || snakeHead.posX == 0 || snakeHead.posY == screenHeight - 1 || snakeHead.posY == 0)
                 {
@@ -74,10 +74,12 @@ namespace Snake
                 if (berryPosX == snakeHead.posX && berryPosY == snakeHead.posY)
                 {
                     score++;
+                    berryPosX = numberGenerator.Next(1, screenWidth - 2);
+                    berryPosY = numberGenerator.Next(1, screenHeight - 2);
                 }
 
                 DrawSnakeHead(snakeHead);
-                DrawBerry(numberGenerator, screenWidth, screenHeight);
+                DrawBerry(berryPosX, berryPosY);
 
                 startTime = DateTime.Now;
                 buttonPressed = "no";
@@ -186,11 +188,8 @@ namespace Snake
             Console.Write("■");
         }
 
-        public static void DrawBerry(Random generator, int screenWidth, int screenHeight) 
+        public static void DrawBerry(int berryPosX, int berryPosY)
         {
-            int berryPosX = generator.Next(1, screenWidth - 2);
-            int berryPosY = generator.Next(1, screenHeight - 2);
-
             Console.SetCursorPosition(berryPosX, berryPosY);
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("■");
