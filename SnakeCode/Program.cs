@@ -24,7 +24,6 @@ namespace Snake
             Random numberGenerator = new Random();
 
             int score = 5;
-            int gameOver = 0;
 
             Pixel snakeHead = new Pixel();
             snakeHead.posX = screenWidth / 2;
@@ -33,40 +32,21 @@ namespace Snake
 
             string currentDirection = "RIGHT";
 
-            List<int> TorsoPosX = new List<int>();
-            List<int> TorsoPosY = new List<int>();
+            List<Pixel> torso = new List<Pixel>();
 
             int berryPosX = numberGenerator.Next(0, screenWidth);
             int berryPosY = numberGenerator.Next(0, screenHeight);
 
-            DateTime startTime = DateTime.Now;
-            DateTime currentTime = DateTime.Now;
-
-            string buttonPressed = "no";
-
             while (true)
             {
                 Console.Clear();
-
                 DrawBorders(screenWidth, screenHeight);
-                Console.ForegroundColor = ConsoleColor.Green;
 
-                if (snakeHead.posX == screenWidth - 1 || snakeHead.posX == 0 || snakeHead.posY == screenHeight - 1 || snakeHead.posY == 0)
-                {
-                    gameOver = 1;
-                }
+                bool hitWall = CheckWallCollision(snakeHead, screenWidth, screenHeight);
+                DrawTorso(torso);
+                bool hitSelf = CheckSelfCollision(torso, snakeHead);
 
-                for (int i = 0; i < TorsoPosX.Count(); i++)
-                {
-                    Console.SetCursorPosition(TorsoPosX[i], TorsoPosY[i]);
-                    Console.Write("■");
-                    if (TorsoPosX[i] == snakeHead.posX && TorsoPosY[i] == snakeHead.posY)
-                    {
-                        gameOver = 1;
-                    }
-                }
-
-                if (gameOver == 1)
+                if (hitWall || hitSelf)
                 {
                     break;
                 }
@@ -81,72 +61,113 @@ namespace Snake
                 DrawSnakeHead(snakeHead);
                 DrawBerry(berryPosX, berryPosY);
 
-                startTime = DateTime.Now;
-                buttonPressed = "no";
-
-                while (true)
-                {
-                    currentTime = DateTime.Now;
-
-                    if (currentTime.Subtract(startTime).TotalMilliseconds > 500) { break; }
-
-                    if (Console.KeyAvailable)
-                    {
-                        ConsoleKeyInfo pressedKey = Console.ReadKey(true);
-
-                        if (pressedKey.Key.Equals(ConsoleKey.UpArrow) && currentDirection != "DOWN" && buttonPressed == "no")
-                        {
-                            currentDirection = "UP";
-                            buttonPressed = "yes";
-                        }
-                        if (pressedKey.Key.Equals(ConsoleKey.DownArrow) && currentDirection != "UP" && buttonPressed == "no")
-                        {
-                            currentDirection = "DOWN";
-                            buttonPressed = "yes";
-                        }
-                        if (pressedKey.Key.Equals(ConsoleKey.LeftArrow) && currentDirection != "RIGHT" && buttonPressed == "no")
-                        {
-                            currentDirection = "LEFT";
-                            buttonPressed = "yes";
-                        }
-                        if (pressedKey.Key.Equals(ConsoleKey.RightArrow) && currentDirection != "LEFT" && buttonPressed == "no")
-                        {
-                            currentDirection = "RIGHT";
-                            buttonPressed = "yes";
-                        }
-                    }
-                }
-
-                TorsoPosX.Add(snakeHead.posX);
-                TorsoPosY.Add(snakeHead.posY);
-
-                switch (currentDirection)
-                {
-                    case "UP":
-                        snakeHead.posY--;
-                        break;
-                    case "DOWN":
-                        snakeHead.posY++;
-                        break;
-                    case "LEFT":
-                        snakeHead.posX--;
-                        break;
-                    case "RIGHT":
-                        snakeHead.posX++;
-                        break;
-                }
-
-                if (TorsoPosX.Count() > score)
-                {
-                    TorsoPosX.RemoveAt(0);
-                    TorsoPosY.RemoveAt(0);
-                }
+                currentDirection = HandleInput(currentDirection);
+                UpdateTorso(torso, snakeHead, score);
+                MoveSnakeHead(snakeHead, currentDirection);
             }
 
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2);
             Console.WriteLine("Game over, Score: " + score);
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2 + 1);
         }
+        public static bool CheckWallCollision(Pixel snakeHead, int screenWidth, int screenHeight)
+        {
+            return snakeHead.posX == screenWidth - 1 || snakeHead.posX == 0
+                || snakeHead.posY == screenHeight - 1 || snakeHead.posY == 0;
+        }
+
+        public static bool CheckSelfCollision(List<Pixel> torso, Pixel snakeHead)
+        {
+            for (int i = 0; i < torso.Count; i++)
+            {
+                if (torso[i].posX == snakeHead.posX && torso[i].posY == snakeHead.posY)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void DrawTorso(List<Pixel> torso)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            for (int i = 0; i < torso.Count; i++)
+            {
+                Console.SetCursorPosition(torso[i].posX, torso[i].posY);
+                Console.Write("■");
+            }
+        }
+
+        public static string HandleInput(string currentDirection)
+        {
+            DateTime startTime = DateTime.Now;
+            string buttonPressed = "no";
+
+            while (true)
+            {
+                DateTime currentTime = DateTime.Now;
+
+                if (currentTime.Subtract(startTime).TotalMilliseconds > 500) { break; }
+
+                if (Console.KeyAvailable && buttonPressed == "no")
+                {
+                    ConsoleKeyInfo pressedKey = Console.ReadKey(true);
+
+                    if (pressedKey.Key.Equals(ConsoleKey.UpArrow) && currentDirection != "DOWN")
+                    {
+                        currentDirection = "UP";
+                        buttonPressed = "yes";
+                    }
+                    if (pressedKey.Key.Equals(ConsoleKey.DownArrow) && currentDirection != "UP")
+                    {
+                        currentDirection = "DOWN";
+                        buttonPressed = "yes";
+                    }
+                    if (pressedKey.Key.Equals(ConsoleKey.LeftArrow) && currentDirection != "RIGHT")
+                    {
+                        currentDirection = "LEFT";
+                        buttonPressed = "yes";
+                    }
+                    if (pressedKey.Key.Equals(ConsoleKey.RightArrow) && currentDirection != "LEFT")
+                    {
+                        currentDirection = "RIGHT";
+                        buttonPressed = "yes";
+                    }
+                }
+            }
+
+            return currentDirection;
+        }
+
+        public static void MoveSnakeHead(Pixel snakeHead, string currentDirection)
+        {
+            switch (currentDirection)
+            {
+                case "UP":
+                    snakeHead.posY--;
+                    break;
+                case "DOWN":
+                    snakeHead.posY++;
+                    break;
+                case "LEFT":
+                    snakeHead.posX--;
+                    break;
+                case "RIGHT":
+                    snakeHead.posX++;
+                    break;
+            }
+        }
+
+        public static void UpdateTorso(List<Pixel> torso, Pixel snakeHead, int score)
+        {
+            torso.Add(new Pixel { posX = snakeHead.posX, posY = snakeHead.posY, color = ConsoleColor.Green });
+
+            if (torso.Count > score)
+            {
+                torso.RemoveAt(0);
+            }
+        }
+
         public class Pixel
         {
             public int posX { get; set; }
